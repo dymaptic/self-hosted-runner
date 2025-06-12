@@ -1,5 +1,7 @@
 # Self-Hosted Runner Dockerization
 
+Based on the original work by [youssefbrr](https://github.com/youssefbrr/self-hosted-runner)
+
 Welcome to the GitHub Self-Hosted Runner Dockerization repository. This project provides a Dockerized solution for setting up a self-hosted GitHub Actions runner.
 
 ## Features
@@ -14,9 +16,7 @@ Welcome to the GitHub Self-Hosted Runner Dockerization repository. This project 
 - `LICENSE`: The license file for this project.
 - `README.md`: The documentation file you are currently reading.
 - `docker-compose.yml`: The Docker Compose file to deploy the self-hosted runner on Linux.
-- `docker-compose.mac.yml`: The Docker Compose file to deploy the self-hosted runner on macOS.
-- `docker-compose.windows.yml`: The Docker Compose file to deploy the self-hosted runner on Windows.
-- `Docker Image/`: A directory containing the Dockerfiles and start scripts for building the runner images.
+- `Runner/`: A directory containing the Dockerfile and start scripts for building the runner image.
 
 ## Getting Started
 
@@ -24,8 +24,10 @@ Welcome to the GitHub Self-Hosted Runner Dockerization repository. This project 
 
 - Docker
 - Docker Compose
+- Docker Desktop (for macOS and Windows users)
+- Get a GitHub runner registration token from your GitHub repository settings. Go to your repository, click on "Settings" > "Actions" > "Runners" > "New self-hosted runner", scroll down to the `Configure` script, and copy the value after `--token`.
 
-### Using Docker Compose on Linux
+### Using Docker Compose
 
 1. Clone the repository:
 
@@ -36,140 +38,37 @@ Welcome to the GitHub Self-Hosted Runner Dockerization repository. This project 
 
 2. Edit the `docker-compose.yml` file to specify your repository, registration token, and runner name.
 
-3. Deploy the self-hosted runner:
-   ```sh
-   docker-compose up -d
-   ```
-
-### Using Docker Compose on macOS
-
-1. Clone the repository:
+3. Build the Docker image. This step is especially necessary if you have made changes to the Dockerfile since a previous build:
 
    ```sh
-   git clone https://github.com/youssefbrr/self-hosted-runner.git
-   cd self-hosted-runner
+   docker-compose build --no-cache
    ```
-
-2. Edit the `docker-compose.mac.yml` file to specify your repository, registration token, and runner name.
-
-3. Deploy the self-hosted runner:
-   ```sh
-   docker-compose -f docker-compose.mac.yml up -d
-   ```
-
-### Using Docker Compose on Windows
-
-1. Prerequisites:
-
-   - Install Docker Desktop for Windows
-   - Enable WSL 2 (Windows Subsystem for Linux)
-   - Install Ubuntu 20.04 from the Microsoft Store or enable it through PowerShell
-
-2. Clone the repository:
-
-   ```sh
-   git clone https://github.com/youssefbrr/self-hosted-runner.git
-   cd self-hosted-runner
-   ```
-
-3. Edit the `docker-compose.windows.yml` file to specify your repository, registration token, and runner name.
 
 4. Deploy the self-hosted runner:
    ```sh
-   docker-compose -f docker-compose.windows.yml up -d
+   docker-compose up
    ```
 
-### Building Your Own Docker Image on Linux
-
-1. Clone the repository:
+5. Tear down the deployment if you don't want to leave it running:
 
    ```sh
-   git clone https://github.com/youssefbrr/self-hosted-runner.git
-   cd self-hosted-runner
-   ```
-
-2. Build the Docker image:
-
-   ```sh
-   cd Docker Image
-   docker build -t custom-github-runner:latest ./
-   ```
-
-3. Edit the `docker-compose.yml` file to use your custom image.
-
-4. Deploy the self-hosted runner:
-   ```sh
-   docker-compose up -d
-   ```
-
-### Building Your Own Docker Image on macOS
-
-1. Clone the repository:
-
-   ```sh
-   git clone https://github.com/youssefbrr/self-hosted-runner.git
-   cd self-hosted-runner
-   ```
-
-2. Build the Docker image:
-
-   ```sh
-   cd Docker Image
-   docker build -t custom-github-runner-mac:latest -f Dockerfile.mac ./
-   ```
-
-3. Edit the `docker-compose.mac.yml` file to use your custom image.
-
-4. Deploy the self-hosted runner:
-   ```sh
-   docker-compose -f docker-compose.mac.yml up -d
-   ```
-
-### Building Your Own Docker Image on Windows
-
-1. Clone the repository:
-
-   ```sh
-   git clone https://github.com/youssefbrr/self-hosted-runner.git
-   cd self-hosted-runner
-   ```
-
-2. Build the Docker image:
-
-   ```sh
-   cd Docker Image
-   docker build -t custom-github-runner-windows:latest -f Dockerfile.windows ./
-   ```
-
-3. Edit the `docker-compose.windows.yml` file to use your custom image.
-
-4. Deploy the self-hosted runner:
-   ```sh
-   docker-compose -f docker-compose.windows.yml up -d
+   docker-compose down
    ```
 
 ## Configuration
 
 ### Environment Variables
 
+Add your environment variables in a file called `.env` in the root directory of the repository. The `.env` file should contain the following variables:
+
 - `REPO`: The GitHub repository to register the runner to (format: `<owner>/<repo>`).
 - `REG_TOKEN`: The registration token for the self-hosted runner from the GitHub repository settings.
 - `NAME`: The name of the self-hosted runner.
 
-## Notes for macOS Users
+### Example `.env` File
 
-For macOS, keep in mind:
-
-1. You need to have Docker Desktop for Mac installed and running.
-2. The macOS runner uses different base images and paths compared to the Linux version.
-3. Performance may differ from the Linux version due to the virtualization layer.
-
-## Notes for Windows Users
-
-For Windows, keep in mind:
-
-1. You need to have Docker Desktop for Windows installed and running.
-2. WSL 2 must be enabled and properly configured.
-3. The Ubuntu 20.04 distribution should be installed through WSL.
-4. Performance may vary depending on your system's virtualization settings.
-5. Make sure your Windows system meets the minimum requirements for running Docker Desktop and WSL 2.
+```env
+REPO=dymaptic/GeoBlazor
+REG_TOKEN=abcd1234efgh5678ijk
+NAME=self-hosted-runner
+```
